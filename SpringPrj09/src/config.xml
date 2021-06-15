@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	
+	<!-- ※ 스프링이 제공하는 환경 설정 XML 파일 샘플 -->
+	<!--    → 스프링이 생성하고 관리해야 할 객체들에 대한 정보 전달 -->
+	
+	<!-- CalculatorImpl 클래스의 객체 생성을 위한 정보 전달 -->
+	<bean id="cal" class="com.test.spr.CalculatorImpl"></bean>
+	
+	<!-- CalculatorAspect 클래스의 객체 생성을 위한 정보 전달 -->
+	<bean id="aspect" class="com.test.spr.CalculatorAspect"></bean>
+	
+	<!-- CalculatorBeforeAdvice 클래스의 객체 생성을 위한 정보 전달 (추가함) 51번째 보고 스프링이 이쪽으로 와서
+	     설계도 어디있는지 보고 설계도 보고 수행함-->
+	<bean id="before" class="com.test.spr.CalculatorBeforeAdvice"></bean>
+	
+	<!-- CalculatorAfterThrowing 클래스의 객체 생성을 위한 정보 전달 -->
+	<bean id="afterThrowing" class="com.test.spr.CalculatorAfterThrowing"></bean>
+	
+	<!-- 프록시를 우리가 안만들뿐(원래는 우리가 직접 활용하기 위해 만들었음 자바 설계도를 보고 우리가 직접 만들었음) -->
+	<!-- 근데 이제 그걸 만드는게 스프링 설계도도 스프링이 가지고 있음  -->
+	
+	<!-- check~!!! -->
+	<!-- 스프링이 제공하는 가짜 객체(Proxy) 클래스의 객체 생성을 위한 정보 전달 -->
+	<!-- 『ProxyFactoryBean』 프록시를 만드는 팩토리빈.. -->
+	<bean id="proxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+	
+		<!-- 주 업무 클래스의 인터페이스 정보 제공 -->
+		<!-- → 『proxyInterfaces』 -->
+		<property name="proxyInterfaces">
+			<list>
+				<value>com.test.spr.Calculator</value>		<!-- 정미 패밀리 -->
+			</list>
+		</property>
+		<!-- proxy 변수의 이름 -->
+		<!-- 복수형의 인터페이스라서 list 써야함 -->
+		
+		<!-- 주 업무 클래스의 객체 정보 제공 -->
+		<!-- 『target』 -->
+		<property name="target" ref="cal"></property>		<!-- cal(정미) 참조 -->
+		
+		<!-- 보조 업무 클래스의 객체 정보 제공 -->
+		<!-- → 『interceptorNames』 하나가 아니라 여러 개 올 수 있어서 맨 뒤에 s 붙음-->
+		<!-- 복수형의 interceptor라서 list써야함 몇 개가 될지 모르니까-->
+		<!-- 현재는 하나만 수행하는거라서 value -->
+		<property name="interceptorNames">
+			<list>
+				<!-- Around Advice -->
+				<value>aspect</value>
+				
+				<!-- Before Advice 스프링한테 추가한 보조 업무인거 알려주는거 -->
+				<value>before</value>
+				
+				<!-- After Throwing Advice 스프링한테 방금 추가한 보조 업무인거 알려주는거 -->
+				<value>afterThrowing</value>
+			</list>
+		</property>
+	
+	</bean>
+
+
+</beans>
